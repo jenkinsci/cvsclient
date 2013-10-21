@@ -450,29 +450,24 @@ public abstract class BasicCommand extends BuildableCommand {
     protected void addRequestsForFile(final File file) throws IOException {
         addDirectoryRequest(file.getParentFile());
 
-        try {
-            final Entry entry = clientServices.getEntry(file);
-            // a non-null entry means the file does exist in the
-            // Entries file for this directory
-            if (entry != null) {
-                addRequestForFile(file, entry);
-            } else if (file.exists()) {
-                // #50963 file exists locally without an entry AND the request
-                // is
-                // for the file explicitly
-                final boolean unusedBinaryFlag = false;
-                addRequest(new ModifiedRequest(file, unusedBinaryFlag));
-            }
-        } catch (final IOException ex) {
-            System.err.println("An error occurred getting the Entry " + "for file " + file + ": " + ex);
-            ex.printStackTrace();
+        final Entry entry = clientServices.getEntry(file);
+        // a non-null entry means the file does exist in the
+        // Entries file for this directory
+        if (entry != null) {
+            addRequestForFile(file, entry);
+        } else if (file.exists()) {
+            // #50963 file exists locally without an entry AND the request
+            // is
+            // for the file explicitly
+            final boolean unusedBinaryFlag = false;
+            addRequest(new ModifiedRequest(file, unusedBinaryFlag));
         }
     }
 
     /**
      * Adds a DirectoryRequest (and maybe a StickyRequest) to the request list.
      */
-    protected final void addDirectoryRequest(final File directory) {
+    protected final void addDirectoryRequest(final File directory) throws IOException {
         // remove localPath prefix from directory. If left with
         // nothing, use dot (".") in the directory request
         final String dir = getRelativeToLocalPathInUnixStyle(directory);
@@ -488,9 +483,6 @@ public abstract class BasicCommand extends BuildableCommand {
             // we can ignore this exception safely because it just means
             // that the user has deleted a directory referenced in a
             // CVS/Entries file
-        } catch (final IOException ex) {
-            System.err.println("An error occurred reading the respository " + "for the directory " + dir + ": " + ex);
-            ex.printStackTrace();
         }
     }
 
