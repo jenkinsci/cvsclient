@@ -47,6 +47,7 @@
 package org.netbeans.lib.cvsclient.response;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -67,6 +68,12 @@ class ModTimeResponse implements Response {
      * The formatter responsible for converting server dates to our own dates
      */
     protected static final DateFormat dateFormatter;
+
+    private static final SimpleDateFormat rfc822DateFormats[] = new SimpleDateFormat[] {
+            new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z", Locale.ENGLISH),
+            new SimpleDateFormat("EEE, d MMM yyyy HH:mm z", Locale.ENGLISH),
+            new SimpleDateFormat("d MMM yyyy HH:mm z", Locale.ENGLISH),
+            new SimpleDateFormat("d MMM yyyy HH:mm:ss z", Locale.ENGLISH) };
 
     /**
      * The way the server formats dates
@@ -95,9 +102,19 @@ class ModTimeResponse implements Response {
             // We remove the ending because SimpleDateFormat does not parse
             // +xxxx, only GMT+xxxx and this avoid us having to do String
             // concat
-            final Date date;
+            Date date = null;
             synchronized (dateFormatter) {
-                date = dateFormatter.parse(dateString.substring(0, dateString.length() - 6));
+                for (DateFormat dateFormat : rfc822DateFormats) {
+                    try {
+                        date = dateFormat.parse(dateString);
+                        break;
+                    } catch (ParseException ex) {
+                        //ignore - we'll fall through to another format
+                    }
+                }
+                if (date == null) {
+                    date = dateFormatter.parse(dateString.substring(0, dateString.length() - 6));
+                }
             }
             if (date.getTime() < 0) {
                 // now we're in trouble - see #18232 issue.
