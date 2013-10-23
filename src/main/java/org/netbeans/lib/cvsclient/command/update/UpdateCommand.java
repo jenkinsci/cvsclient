@@ -50,6 +50,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -195,15 +196,17 @@ public class UpdateCommand extends BasicCommand implements TemporaryFileCreator 
     protected void sendEntryAndModifiedRequests(final Entry entry, File file) {
         if (isCleanCopy() && (file != null) && (entry != null)) {
             if (!isPipeToOutput()) {
-                FORMAT_PARAMETER[0] = file.getParent();
-                FORMAT_PARAMETER[1] = file.getName();
-                FORMAT_PARAMETER[2] = entry.getRevision();
+                if (!new Date(file.lastModified()).equals(entry.getLastModified())) {
+                    FORMAT_PARAMETER[0] = file.getParent();
+                    FORMAT_PARAMETER[1] = file.getName();
+                    FORMAT_PARAMETER[2] = entry.getRevision();
 
-                final String filename = MessageFormat.format(RENAME_FORMAT, FORMAT_PARAMETER);
-                try {
-                    FileUtils.copyFile(file, new File(filename));
-                } catch (final IOException e) {
-                    // backup copy will not be created
+                    final String filename = MessageFormat.format(RENAME_FORMAT, FORMAT_PARAMETER);
+                    try {
+                        FileUtils.copyFile(file, new File(filename));
+                    } catch (final IOException e) {
+                        // backup copy will not be created
+                    }
                 }
             }
             file = null;
