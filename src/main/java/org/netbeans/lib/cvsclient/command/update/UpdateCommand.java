@@ -209,7 +209,7 @@ public class UpdateCommand extends BasicCommand implements TemporaryFileCreator 
                     }
                 }
             }
-            file = null;
+            //file = null;
         }
         super.sendEntryAndModifiedRequests(entry, file);
     }
