@@ -309,7 +309,7 @@ public class UpdateCommand extends BasicCommand implements TemporaryFileCreator 
             }
             if ((getUpdateByRevision() != null) && (getUpdateByRevision().length() > 0)) {
                 requests.add(1, new ArgumentRequest("-r")); // NOI18N
-                requests.add(2, new ArgumentRequest(getUpdateByRevision());
+                requests.add(2, new ArgumentRequest(getUpdateByRevision()));
             }
             if (getMergeRevision1() != null) {
                 requests.add(1, new ArgumentRequest("-j")); // NOI18N
