@@ -303,10 +303,11 @@ public class UpdateCommand extends BasicCommand implements TemporaryFileCreator 
             if (isUseHeadIfNotFound()) {
                 requests.add(1, new ArgumentRequest("-f")); // NOI18N
             }
-            if (getUpdateByDate() != null) {
+            if ((getUpdateByDate() != null) && (getUpdateByDate().length() > 0)) {
                 requests.add(1, new ArgumentRequest("-D")); // NOI18N
                 requests.add(2, new ArgumentRequest(getUpdateByDate()));
-            } else if (getUpdateByRevision() != null) {
+            }
+            if ((getUpdateByRevision() != null) && (getUpdateByRevision().length() > 0) && !getUpdateByRevision().equals("HEAD")) {
                 requests.add(1, new ArgumentRequest("-r")); // NOI18N
                 requests.add(2, new ArgumentRequest(getUpdateByRevision()));
             }
