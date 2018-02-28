@@ -5,20 +5,20 @@
     <packaging>jar</packaging>
     <version>71-jenkins-12-SNAPSHOT</version>
     <name>CvsClient</name>
-    <description>Netbeans cvsclient library patched for serialization and synchronization</description>
+    <description>NetBeans cvsclient library patched for serialization and synchronization</description>
     <licenses>
        <license>
            <url>http://www.netbeans.org/cddl-gplv2.html</url>
        </license>
     </licenses>
-    <distributionManagement>
+    <distributionManagement> <!-- TODO pick up from org.jenkins-ci:jenkins -->
         <repository>
-          <id>maven.jenkins-ci.org</id>
-          <url>http://maven.jenkins-ci.org:8081/content/repositories/releases</url>
+            <id>maven.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/releases/</url>
         </repository>
         <snapshotRepository>
-          <id>maven.jenkins-ci.org</id>
-          <url>http://maven.jenkins-ci.org:8081/content/repositories/snapshots</url>
+            <id>maven.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
@@ -61,18 +61,5 @@
         </plugin>
       </plugins>
     </build>
-
-    <repositories>
-        <repository>
-          <id>maven.jenkins-ci.org</id>
-          <url>http://maven.jenkins-ci.org/content/groups/artifacts/</url>
-            <releases>
-               <enabled>true</enabled>
-            </releases>
-            <snapshots>
-               <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
 </project>
