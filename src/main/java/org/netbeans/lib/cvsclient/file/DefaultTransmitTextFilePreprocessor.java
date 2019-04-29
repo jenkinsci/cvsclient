@@ -51,6 +51,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * @author Thomas Singer
@@ -86,11 +87,27 @@ public class DefaultTransmitTextFilePreprocessor implements TransmitTextFilePrep
             final byte[] fileChunk = new byte[CHUNK_SIZE];
             final byte[] fileWriteChunk = new byte[CHUNK_SIZE];
 
+            byte lastChar = 0;
             for (int readLength = in.read(fileChunk); readLength > 0; readLength = in.read(fileChunk)) {
 
                 if (doConversion) {
                     int writeLength = 0;
                     for (int i = 0; i < readLength;) {
+                        if (lastChar == newLine[0]) {
+                            int pos = findIndexOf(fileChunk, Arrays.copyOfRange(newLine, 1, newLine.length), 0);
+                            if (pos == 0 && pos < readLength) {
+                                // new chunk starts with te resto of the line separator
+                                // skip the rest of the separator in the original text
+                                i = newLine.length - 1;
+                                // and write new line
+                                fileWriteChunk[writeLength++] = '\n';
+                            } else {
+                                // must write the last not yet written char from the previous round
+                                out.write(lastChar);
+                            }
+                            lastChar = 0;
+                            continue;
+                        }
                         final int pos = findIndexOf(fileChunk, newLine, i);
                         if ((pos >= i) && (pos < readLength)) {
                             System.arraycopy(fileChunk, i, fileWriteChunk, writeLength, pos - i);
@@ -101,12 +118,21 @@ public class DefaultTransmitTextFilePreprocessor implements TransmitTextFilePrep
                             System.arraycopy(fileChunk, i, fileWriteChunk, writeLength, readLength - i);
                             writeLength += readLength - i;
                             i = readLength;
+                            if (newLine.length != 1 && fileChunk[readLength - 1] == newLine[0]) {
+                                // new line separator may be splitted between chunks
+                                lastChar = fileChunk[readLength - 1];
+                                writeLength--;
+                            }
                         }
                     }
                     out.write(fileWriteChunk, 0, writeLength);
                 } else {
                     out.write(fileChunk, 0, readLength);
                 }
+            }
+            if (lastChar != 0) {
+                // must write the last not yet written char from the previous round
+                out.write(lastChar);
             }
             return preprocessedTextFile;
         } catch (final IOException ex) {
